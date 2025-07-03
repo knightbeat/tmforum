@@ -1,0 +1,198 @@
+openapi: 3.0.3
+info:
+  title: TMF629 Customer Management API (Mock)
+  version: 1.0.0
+  description: Mock implementation of TMF629 endpoints for customer and account management.
+servers:
+  - url: http://localhost:3004
+paths:
+  /customer:
+    post:
+      summary: Create a customer
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+  /customer/{id}:
+    get:
+      summary: Retrieve a customer by ID
+      operationId: getCustomer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /account:
+    post:
+      summary: Create a customer account
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+
+  /account/{id}:
+    get:
+      summary: Retrieve an account by ID
+      operationId: getAccount
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CustomerRequest:
+      type: object
+      required:
+        - givenName
+        - familyName
+      properties:
+        givenName:
+          type: string
+          example: Jesse
+        familyName:
+          type: string
+          example: Pinkman
+        contactMedium:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactMedium'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        customerCategory:
+          type: string
+          example: Residential
+
+    CustomerResponse:
+      allOf:
+        - $ref: '#/components/schemas/CustomerRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+              example: CUST-17283910
+            status:
+              type: string
+              example: Created
+
+    AccountRequest:
+      type: object
+      required:
+        - customerId
+        - accountType
+      properties:
+        customerId:
+          type: string
+          example: CUST-17283910
+        accountType:
+          type: string
+          example: Residential
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        creditLimit:
+          type: number
+          format: float
+          example: 10000
+
+    AccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/AccountRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+              example: ACC-17283910
+            status:
+              type: string
+              example: Created
+
+    ContactMedium:
+      type: object
+      properties:
+        mediumType:
+          type: string
+          example: telephoneNumber
+        characteristic:
+          type: object
+          additionalProperties: true
+          example:
+            phoneNumber: "+1-505-503-4455"
+
+    Address:
+      type: object
+      properties:
+        street1:
+          type: string
+          example: 308 Negra Arroyo Lane
+        city:
+          type: string
+          example: Albuquerque
+        stateOrProvince:
+          type: string
+          example: NM
+        postcode:
+          type: string
+          example: "87104"
+        country:
+          type: string
+          example: USA
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not found
